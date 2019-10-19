@@ -2,7 +2,8 @@ class UsersController < ApplicationController
   def sign_up
     user = User.new(user_params)
     if(user.save)
-      render json: UserSerializer.new(user), status: :ok
+      api_token = JsonWebToken.encode({id: user.id}, browser: request.env['HTTP_USER_AGENT'])
+      render json: {api_token: api_token}, status: :ok
     else
       render json: {errors: user.errors.messages}, status: :bad_request
     end
@@ -12,12 +13,15 @@ class UsersController < ApplicationController
     email = user_params[:email]
     password = user_params[:password]
     user = User.find_by_email(email)
+
     if(!user)
       render json: {errors: {email: 'No user found with the given email.'}}, status: :bad_request
     elsif user && !user.authenticate(password)
       render json: {errors: {password: 'Wrong password. Please try again.'}}, status: :bad_request
     else
-      render json: UserSerializer.new(user), status: :ok
+      api_token = JsonWebToken.encode({id: user.id}, browser: request.env['HTTP_USER_AGENT'])
+      # render json: UserSerializer.new(user), status: :ok
+      render json: {api_token: api_token}, status: :ok
     end
   end
 

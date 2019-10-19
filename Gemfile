@@ -15,6 +15,10 @@ gem 'fast_jsonapi'
 gem 'bcrypt', '~> 3.1.7'
 gem 'jwt'
 
+# For caching and ttl for api_key
+gem 'redis'
+gem 'browser'
+
 # Use Active Storage variant
 gem 'image_processing', '~> 1.2'
 
