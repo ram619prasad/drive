@@ -54,3 +54,6 @@ gem 'aws-sdk-s3', '~> 1'
 
 # For maintaining nested parent-child relationship
 gem 'ancestry'
+
+# CORS support
+gem 'rack-cors'
