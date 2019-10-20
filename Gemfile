@@ -7,6 +7,8 @@ ruby '2.6.3'
 gem 'rails', '~> 6.0.0'
 # For Postgres support
 gem 'pg'
+# For environment variables
+gem 'dotenv-rails'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
 # For JSON views.
@@ -34,9 +36,6 @@ group :development, :test do
   # Mostly for only testing
   gem 'factory_bot'
   gem 'mocha'
-
-  # For environment variables
-  gem 'dotenv-rails'
 end
 
 group :development do
