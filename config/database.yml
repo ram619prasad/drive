@@ -19,4 +19,5 @@ test:
 
 production:
   <<: *default
+  secret_key_base: <%= ENV["SECRET_KEY"] %>
   database: <%= ENV['POSTGRES_DB'] %>
