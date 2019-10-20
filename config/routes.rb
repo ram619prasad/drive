@@ -6,4 +6,6 @@ Rails.application.routes.draw do
       post :sign_in, to: :sign_in
     end
   end
+
+  resources :folders
 end

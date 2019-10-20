@@ -8,7 +8,7 @@ class JsonWebToken
     encoded_token
   end
 
-  def decode(token, browser: 'NA')
+  def self.decode(token, browser: 'NA')
     body = JWT.decode(token, ENV['SECRET_KEY'])[0]
     HashWithIndifferentAccess.new body
   rescue

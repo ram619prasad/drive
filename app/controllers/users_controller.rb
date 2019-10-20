@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  skip_before_action :authorize_user, only: [:sign_up, :sign_in]
+
   def sign_up
     user = User.new(user_params)
     user.upsert_bucket
