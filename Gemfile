@@ -51,3 +51,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # AWS SDK - 3
 gem 'aws-sdk', '~> 3'
 gem 'aws-sdk-s3', '~> 1'
+
+# For maintaining nested parent-child relationship
+gem 'ancestry'
