@@ -58,6 +58,7 @@ GEM
       zeitwerk (~> 2.1, >= 2.1.8)
     ancestry (3.0.7)
       activerecord (>= 3.2.0)
+    api-pagination (4.8.2)
     aws-eventstream (1.0.3)
     aws-partitions (1.226.0)
     aws-sdk (3.0.1)
@@ -867,6 +868,18 @@ GEM
       ruby-vips (>= 2.0.13, < 3)
     jmespath (1.4.0)
     jwt (2.2.1)
+    kaminari (1.1.1)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.1.1)
+      kaminari-activerecord (= 1.1.1)
+      kaminari-core (= 1.1.1)
+    kaminari-actionview (1.1.1)
+      actionview
+      kaminari-core (= 1.1.1)
+    kaminari-activerecord (1.1.1)
+      activerecord
+      kaminari-core (= 1.1.1)
+    kaminari-core (1.1.1)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -956,6 +969,7 @@ PLATFORMS
 
 DEPENDENCIES
   ancestry
+  api-pagination
   aws-sdk (~> 3)
   aws-sdk-s3 (~> 1)
   bcrypt (~> 3.1.7)
@@ -967,6 +981,7 @@ DEPENDENCIES
   fast_jsonapi
   image_processing (~> 1.2)
   jwt
+  kaminari
   listen (>= 3.0.5, < 3.2)
   mocha
   pg

@@ -57,3 +57,7 @@ gem 'ancestry'
 
 # CORS support
 gem 'rack-cors'
+
+# For pagination
+gem 'kaminari'
+gem 'api-pagination'
