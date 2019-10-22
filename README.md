@@ -1,24 +1,10 @@
-# README
+## About
+    This project aims in creating folders and uploading files so that we can have all files in one location.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Technology stack
+   - ruby 2.6.3
+   - rails 6.0.0
+   - Reddis server 5.0.6
+   - Postgresql 9.6.5
+   - AWS S3
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
