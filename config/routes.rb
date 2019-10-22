@@ -7,5 +7,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :folders
+  resources :folders do
+    member do
+      post :add_files, to: :add_files
+    end
+  end
 end

@@ -1,5 +1,5 @@
 class FoldersController < ApplicationController
-  before_action :find_folder, only: [:show, :update, :destroy]
+  before_action :find_folder, only: [:show, :update, :destroy, :add_files]
 
   def create
     folder = Folder.new(folder_params)
@@ -36,10 +36,18 @@ class FoldersController < ApplicationController
     render json: FolderSerializer.new(folders), status: :ok
   end
 
+  def add_files
+    @folder.files.attach(params[:folder][:files])
+    @folder.save!
+    render json: FolderSerializer.new(@folder), status: :ok
+  rescue => e
+    render json: { errors: e.message }, status: :bad_request
+  end
+
   private
 
   def folder_params
-    params.require(:folder).permit(:name, :user_id, :parent_id)
+    params.require(:folder).permit(:name, :user_id, :parent_id, files: [])
   end
 
   def paginate_params
@@ -47,7 +55,7 @@ class FoldersController < ApplicationController
   end
 
   def find_folder
-    @folder = Folder.find(params[:id])
+    @folder = Folder.with_attached_files.find(params[:id])
   rescue => e
     render json: { errors: e.message }, status: :not_found
   end

@@ -6,4 +6,8 @@ class FolderSerializer
   attribute :children do |object|
     object.children.select([:id, :name, :user_id])
   end
+
+  attribute :files_metadata do |object|
+    object.attached_files_metadata
+  end
 end
