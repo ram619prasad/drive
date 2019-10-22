@@ -18,7 +18,6 @@ class FoldersController < ApplicationController
   end
 
   def update
-    byebug
     @folder.update_attributes!(folder_params.except(:user_id))
     render json: FolderSerializer.new(@folder), status: :ok
   rescue => e
