@@ -37,7 +37,8 @@ class FoldersController < ApplicationController
   end
 
   def add_files
-    @folder.files.attach(params[:folder][:files])
+    add_files_to_user_directory
+  #   @folder.files.attach(params[:folder][:files])
     @folder.save!
     render json: FolderSerializer.new(@folder), status: :ok
   rescue => e
@@ -58,5 +59,39 @@ class FoldersController < ApplicationController
     @folder = Folder.with_attached_files.find(params[:id])
   rescue => e
     render json: { errors: e.message }, status: :not_found
+  end
+
+  def add_files_to_user_directory
+    return if folder_params[:files].blank?
+
+    blobs = []
+    folder_params[:files].each do |file|
+      filename = file.original_filename
+      existing_blob = ActiveStorage::Blob.find_by(filename: filename)
+
+      # Do not attach the duplicate files
+      if existing_blob.blank?
+        blob = ActiveStorage::Blob.new.tap do |blob|
+          blob.filename = filename
+          blob.key = base_path_for_files_uploads(file)
+          blob.upload file
+          blob.save!
+        end
+
+        blobs << blob
+      end
+    end
+
+    @folder.files.attach(blobs)
+  end
+
+  def base_path_for_files_uploads(file)
+    config = YAML.load_file(Rails.root.join('config', 'storage.yml'))
+    if Rails.configuration.active_storage.service.to_s == 'local'
+      "storage/#{current_user.email}/#{file.original_filename}"
+    elsif Rails.configuration.active_storage.service.to_s == 'amazon'
+      config['amazon']['bucket'] + '/' + current_user.email + file.original_filename
+    else
+    end
   end
 end
