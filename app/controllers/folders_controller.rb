@@ -90,7 +90,7 @@ class FoldersController < ApplicationController
     if Rails.configuration.active_storage.service.to_s == 'local'
       "storage/#{current_user.email}/#{file.original_filename}"
     elsif Rails.configuration.active_storage.service.to_s == 'amazon'
-      config['amazon']['bucket'] + '/' + current_user.email + file.original_filename
+      "#{current_user.email}/#{file.original_filename}"
     else
     end
   end

@@ -17,10 +17,12 @@ class Folder < ApplicationRecord
     files.each do |file|
       blob = file.blob
       metadata << {
+        id: blob.id,
         filename: blob.filename.to_s,
         content_type: blob.content_type,
         byte_size: blob.byte_size,
-        metadata: blob.metadata
+        metadata: blob.metadata,
+        link: Rails.configuration.active_storage.service.to_s == 'amazon' ? file.blob.service_url : Rails.application.routes.url_helpers.rails_blob_url(file.blob)
       }
     end
 
