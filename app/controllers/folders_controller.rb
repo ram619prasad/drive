@@ -1,5 +1,5 @@
 class FoldersController < ApplicationController
-  before_action :find_folder, only: [:show, :update, :destroy, :add_files]
+  before_action :find_folder, only: [:show, :update, :destroy, :add_files, :remove_files]
 
   def create
     folder = Folder.new(folder_params)
@@ -38,8 +38,14 @@ class FoldersController < ApplicationController
 
   def add_files
     add_files_to_user_directory
-  #   @folder.files.attach(params[:folder][:files])
     @folder.save!
+    render json: FolderSerializer.new(@folder), status: :ok
+  rescue => e
+    render json: { errors: e.message }, status: :bad_request
+  end
+
+  def remove_files
+    @folder.files.purge
     render json: FolderSerializer.new(@folder), status: :ok
   rescue => e
     render json: { errors: e.message }, status: :bad_request
@@ -56,7 +62,7 @@ class FoldersController < ApplicationController
   end
 
   def find_folder
-    @folder = Folder.with_attached_files.find(params[:id])
+    @folder = current_user.folders.with_attached_files.find(params[:id])
   rescue => e
     render json: { errors: e.message }, status: :not_found
   end
@@ -66,14 +72,14 @@ class FoldersController < ApplicationController
 
     blobs = []
     folder_params[:files].each do |file|
-      filename = file.original_filename
-      existing_blob = ActiveStorage::Blob.find_by(filename: filename)
+      key = base_path_for_files_uploads(file)
+      existing_blob = ActiveStorage::Blob.find_by(key: key)
 
       # Do not attach the duplicate files
       if existing_blob.blank?
         blob = ActiveStorage::Blob.new.tap do |blob|
-          blob.filename = filename
-          blob.key = base_path_for_files_uploads(file)
+          blob.filename = file.original_filename
+          blob.key = key
           blob.upload file
           blob.save!
         end
@@ -88,9 +94,9 @@ class FoldersController < ApplicationController
   def base_path_for_files_uploads(file)
     config = YAML.load_file(Rails.root.join('config', 'storage.yml'))
     if Rails.configuration.active_storage.service.to_s == 'local'
-      "storage/#{current_user.email}/#{file.original_filename}"
+      "storage/#{current_user.email}/#{@folder.name}/#{file.original_filename}"
     elsif Rails.configuration.active_storage.service.to_s == 'amazon'
-      "#{current_user.email}/#{file.original_filename}"
+      "#{current_user.email}/#{@folder.name}/#{file.original_filename}"
     else
     end
   end

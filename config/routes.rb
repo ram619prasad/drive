@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   resources :folders do
     member do
       post :add_files, to: :add_files
+      patch :remove_files, to: :remove_files
     end
   end
 end
