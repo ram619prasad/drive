@@ -93,11 +93,15 @@ class FoldersController < ApplicationController
 
   def base_path_for_files_uploads(file)
     config = YAML.load_file(Rails.root.join('config', 'storage.yml'))
+    path = @folder.ancestors.present? ?
+             "#{current_user.email}/#{@folder.ancestors.map(&:name).join('/')}/#{@folder.name}/#{file.original_filename}" :
+             "#{current_user.email}/#{@folder.name}/#{file.original_filename}"
     if Rails.configuration.active_storage.service.to_s == 'local'
-      "storage/#{current_user.email}/#{@folder.name}/#{file.original_filename}"
+      "storage/#{path}"
     elsif Rails.configuration.active_storage.service.to_s == 'amazon'
-      "#{current_user.email}/#{@folder.name}/#{file.original_filename}"
+      path
     else
+      "tmp/#{path}"
     end
   end
 end
