@@ -32,6 +32,10 @@ class UsersController < ApplicationController
     end
   end
 
+  def profile
+    render json: UserSerializer.new(current_user), status: :ok
+  end
+
   private
 
   def user_params

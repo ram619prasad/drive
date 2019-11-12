@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     collection do
       post :sign_up, to: :sign_up
       post :sign_in, to: :sign_in
+      get :profile, to: :profile
     end
   end
 
