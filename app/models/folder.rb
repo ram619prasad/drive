@@ -28,4 +28,21 @@ class Folder < ApplicationRecord
 
     metadata
   end
+
+  def update_file(file:, filename:)
+    raise StandardError.new('Filename cannot be blank.') if filename.blank?
+  
+    # blob = ActiveStorage::Blob.find(id)
+    old_filename = file.filename.to_s
+    extension = ActiveStorage::Filename.new(old_filename).extension_with_delimiter
+
+    # update the file's key and filename
+    new_filename = filename + extension
+    file.filename = new_filename
+    file.key = ancestors.present? ?
+                "#{user.email}/#{ancestors.map(&:name).join('/')}/#{name}/#{new_filename}" :
+                "#{user.email}/#{name}/#{new_filename}"
+    file.save!
+    file
+  end
 end

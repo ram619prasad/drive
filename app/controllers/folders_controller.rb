@@ -1,5 +1,6 @@
 class FoldersController < ApplicationController
-  before_action :find_folder, only: [:show, :update, :destroy, :add_files, :remove_files]
+  before_action :find_folder, only: [:show, :update, :destroy, :add_files, :remove_files, :rename_file]
+  before_action :find_files, only: [:rename_file]
 
   def create
     folder = Folder.new(folder_params)
@@ -51,10 +52,21 @@ class FoldersController < ApplicationController
     render json: { errors: e.message }, status: :bad_request
   end
 
+  def rename_file
+    file = @folder.update_file(file: @file, filename: file_params[:filename])
+    render json: { file: file }, status: :ok
+  rescue => e
+    render json: { errors: e.message }, status: :bad_request
+  end
+
   private
 
   def folder_params
-    params.require(:folder).permit(:name, :user_id, :parent_id, files: [])
+    params.require(:folder).permit(:name, :user_id, :parent_id, files: [], file: [:id, :filename])
+  end
+
+  def file_params
+    folder_params[:file]
   end
 
   def paginate_params
@@ -65,6 +77,12 @@ class FoldersController < ApplicationController
     @folder = current_user.folders.with_attached_files.find(params[:id])
   rescue => e
     render json: { errors: e.message }, status: :not_found
+  end
+
+  def find_files
+    @file = @folder.files.blobs.find(file_params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { errors: "Could not find file with id: #{file_params[:id]} in folder #{@folder.name}(id: #{@folder.id})" }, status: :not_found
   end
 
   def add_files_to_user_directory
