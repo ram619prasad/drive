@@ -10,9 +10,9 @@ class User < ApplicationRecord
   has_many :folders
 
   # Instance Methods
-
-  # Class Methods
   def upsert_bucket
     S3.put_object(bucket: "fidisys", key: "#{email}/")
   end
+
+  # Class Methods
 end
