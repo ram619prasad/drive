@@ -34,7 +34,8 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   # Mostly for only testing
-  gem 'factory_bot'
+  # gem 'factory_bot'
+  gem 'factory_bot_rails'
   gem 'mocha'
 end
 
@@ -45,6 +46,16 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
+# group :test do
+#   gem 'database_cleaner-active_record'
+# end
+
+# group :development, :test do
+#   gem 'factory_bot_rails'
+#   gem 'database_cleaner-active_record'
+#   gem 'mocha'
+# end
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
@@ -54,9 +65,6 @@ gem 'aws-sdk-s3', '~> 1'
 
 # For maintaining nested parent-child relationship
 gem 'ancestry'
-
-# CORS support
-gem 'rack-cors'
 
 # For pagination
 gem 'kaminari'

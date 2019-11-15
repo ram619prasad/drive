@@ -856,6 +856,9 @@ GEM
     erubi (1.9.0)
     factory_bot (5.1.1)
       activesupport (>= 4.2.0)
+    factory_bot_rails (5.1.1)
+      factory_bot (~> 5.1.0)
+      railties (>= 4.2.0)
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
     ffi (1.11.1)
@@ -977,7 +980,7 @@ DEPENDENCIES
   browser
   byebug
   dotenv-rails
-  factory_bot
+  factory_bot_rails
   fast_jsonapi
   image_processing (~> 1.2)
   jwt
