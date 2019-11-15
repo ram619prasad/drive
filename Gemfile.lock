@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/faker-ruby/faker.git
+  revision: d8e48fa0f49321780e930a6f17889fa2282949dc
+  branch: master
+  specs:
+    faker (2.7.0)
+      i18n (>= 1.6, < 1.8)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -981,6 +989,7 @@ DEPENDENCIES
   byebug
   dotenv-rails
   factory_bot_rails
+  faker!
   fast_jsonapi
   image_processing (~> 1.2)
   jwt

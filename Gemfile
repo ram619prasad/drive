@@ -36,7 +36,7 @@ group :development, :test do
   # Mostly for only testing
   # gem 'factory_bot'
   gem 'factory_bot_rails'
-  gem 'mocha'
+  gem 'faker', :git => 'https://github.com/faker-ruby/faker.git', :branch => 'master'
 end
 
 group :development do
@@ -46,15 +46,10 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
-# group :test do
-#   gem 'database_cleaner-active_record'
-# end
-
-# group :development, :test do
-#   gem 'factory_bot_rails'
-#   gem 'database_cleaner-active_record'
-#   gem 'mocha'
-# end
+group :test do
+  # gem 'database_cleaner-active_record'
+  gem 'mocha'
+end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
