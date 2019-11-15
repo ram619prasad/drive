@@ -52,7 +52,6 @@ end
 group :test do
   # gem 'database_cleaner-active_record'
   gem 'mocha'
-  # gem 'shoulda'
   gem 'shoulda-context'
   gem 'shoulda-matchers'
 end

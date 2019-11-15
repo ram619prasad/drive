@@ -13,6 +13,6 @@ class User < ApplicationRecord
 
   # Class Methods
   def upsert_bucket
-    res = S3.put_object(bucket: "fidisys", key: "#{email}/")
+    S3.put_object(bucket: "fidisys", key: "#{email}/")
   end
 end

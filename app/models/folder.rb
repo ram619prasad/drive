@@ -5,7 +5,6 @@ class Folder < ApplicationRecord
 
   # Associations
   belongs_to :user
-  # scope :with_eager_loaded_images, -> { preload(images_attachments: :blob) }
 
   # Validations
   validates_presence_of :user_id, :name
