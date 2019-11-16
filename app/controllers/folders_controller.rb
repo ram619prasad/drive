@@ -1,6 +1,7 @@
 class FoldersController < ApplicationController
-  before_action :find_folder, only: [:show, :update, :destroy, :add_files, :remove_files, :rename_file]
+  before_action :find_folder, only: [:show, :update, :destroy, :add_files, :remove_files, :rename_file, :move_files]
   before_action :find_files, only: [:rename_file]
+  before_action :find_attachments, only: :move_files
 
   def create
     folder = current_user.folders.new(folder_params)
@@ -59,6 +60,20 @@ class FoldersController < ApplicationController
     render json: { errors: e.message }, status: :bad_request
   end
 
+  def move_files
+    render json: { message: "No files are found with the ids #{folder_params[:files]}" }, status: :not_found and return if @attachments.blank?
+    destination_folder = Folder.find(folder_params[:parent_id])
+
+    # Move the files to the destination folder in S3
+    Folder.move_files(@attachments, @folder, destination_folder, current_user)
+    # Update Locally
+    @attachments.update_all(record_id: destination_folder.id)
+    render json: FolderSerializer.new(@folder.reload), status: :ok
+  
+  rescue => e
+    render json: { errors: e.message }, status: :bad_request
+  end
+
   private
 
   def folder_params
@@ -77,6 +92,10 @@ class FoldersController < ApplicationController
     @folder = current_user.folders.with_attached_files.find(params[:id])
   rescue => e
     render json: { errors: e.message }, status: :not_found
+  end
+
+  def find_attachments
+    @attachments = @folder.files.where(id: folder_params[:files])
   end
 
   def find_files
@@ -101,12 +120,13 @@ class FoldersController < ApplicationController
           blob.upload file
           blob.save!
         end
-
         blobs << blob
       end
     end
 
     @folder.files.attach(blobs)
+  rescue => e
+    byebug
   end
 
   def base_path_for_files_uploads(file)
@@ -114,6 +134,7 @@ class FoldersController < ApplicationController
     path = @folder.ancestors.present? ?
              "#{current_user.email}/#{@folder.ancestors.map(&:name).join('/')}/#{@folder.name}/#{file.original_filename}" :
              "#{current_user.email}/#{@folder.name}/#{file.original_filename}"
+
     if Rails.configuration.active_storage.service.to_s == 'local'
       "storage/#{path}"
     elsif Rails.configuration.active_storage.service.to_s == 'amazon'
