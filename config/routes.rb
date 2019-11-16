@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       patch :remove_files, to: :remove_files
       patch :rename_file, to: :rename_file
       post :move_files, to: :move_files
+      get :list_files, to: :list_files
     end
   end
 end

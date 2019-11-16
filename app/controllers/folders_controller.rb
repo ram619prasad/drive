@@ -1,5 +1,5 @@
 class FoldersController < ApplicationController
-  before_action :find_folder, only: [:show, :update, :destroy, :add_files, :remove_files, :rename_file, :move_files]
+  before_action :find_folder, only: [:show, :update, :destroy, :add_files, :remove_files, :rename_file, :move_files, :list_files]
   before_action :find_files, only: [:rename_file]
   before_action :find_attachments, only: :move_files
 
@@ -36,6 +36,11 @@ class FoldersController < ApplicationController
   def index
     folders = paginate current_user.folders, page: params[:page], per_page: params[:per_page]
     render json: FolderSerializer.new(folders), status: :ok
+  end
+
+  def list_files
+    attachments = paginate @folder.files, page: params[:page], per_page: params[:per_page]
+    render json: FileSerializer.new(attachments), status: :ok
   end
 
   def add_files
