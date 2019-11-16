@@ -78,4 +78,49 @@ class FolderTest < ActiveSupport::TestCase
   end
 
   # Class Methods
+  context 'Folder.move_files' do
+    setup do
+      @user = FactoryBot.create(:user)
+      @source = FactoryBot.create(:folder, user: @user)
+      img = Rack::Test::UploadedFile.new(Rails.root.join('test', 'assets', 'sample.jpg'), 'image/jpeg')
+      @source.files.attach(img)
+      @destination = FactoryBot.create(:folder, user: @user)
+    end
+
+    context 'without S3 integration' do
+      should 'update blob key only' do
+        blob = @source.files.first.blob
+        new_path = path(@user, @destination, blob)
+        Folder.move_files(@source.files, @source, @destination, @user)
+        assert_equal new_path, blob.reload.key
+      end
+    end
+
+    context 'with S3 integration' do
+      setup do
+        @service = OpenStruct.new(service: 'amazon')
+        @config = OpenStruct.new(active_storage: @service)
+        Rails.expects(:configuration).returns(@config).at_least_once
+        S3.expects(:copy_object).once
+        S3.expects(:delete_object).once
+      end
+
+      should 'update blob key and do necessary s3 calls to update the file' do
+        blob = @source.files.first.blob
+        new_path = path(@user, @destination, blob).gsub('tmp/', '')
+
+        Folder.move_files(@source.files, @source, @destination, @user)
+        assert_equal new_path, blob.reload.key
+      end
+    end
+  end
+
+  private
+
+  def path(user, source, file)
+    source.ancestors.present? ?
+      "tmp/#{user.email}/#{source.ancestors.map(&:name).join('/')}/#{source.name}/#{file.filename}" :
+      "tmp/#{user.email}/#{source.name}/#{file.filename}"
+  end
+
 end

@@ -60,18 +60,20 @@ class Folder < ApplicationRecord
       target_bucket_name = bucket_name
       source_key = source_path
       target_key = destination_path
+
       blob = file.blob
+      blob.key = target_key
+      blob.save!
 
-      begin
-        blob.key = target_key
-        blob.save!
-
-        S3.copy_object(bucket: target_bucket_name, copy_source: "#{source_bucket_name}/#{source_key}", key: target_key)
-        S3.delete_object(bucket: source_bucket_name, key: source_key)
-      rescue StandardError => ex
-        puts 'Caught exception copying object ' + source_key + ' from bucket ' + source_bucket_name + ' to bucket ' + target_bucket_name + ' as ' + target_key + ':'
-        puts ex.message
-        next
+      if Rails.configuration.active_storage.service.to_s == 'amazon'
+        begin
+          S3.copy_object(bucket: target_bucket_name, copy_source: "#{source_bucket_name}/#{source_key}", key: target_key)
+          S3.delete_object(bucket: source_bucket_name, key: source_key)
+        rescue StandardError => ex
+          puts 'Caught exception copying object ' + source_key + ' from bucket ' + source_bucket_name + ' to bucket ' + target_bucket_name + ' as ' + target_key + ':'
+          puts ex.message
+          next
+        end
       end
     end
   end
