@@ -31,7 +31,7 @@ class Folder < ApplicationRecord
   end
 
   def update_file(file:, filename:)
-    raise StandardError.new('Filename cannot be blank.') if filename.blank?
+    raise 'Filename cannot be blank.' if filename.blank?
   
     # blob = ActiveStorage::Blob.find(id)
     old_filename = file.filename.to_s

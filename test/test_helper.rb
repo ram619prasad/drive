@@ -10,6 +10,9 @@ class ActiveSupport::TestCase
 
   # FactoryBot support
   include FactoryBot::Syntax::Methods
+  FactoryBot::SyntaxRunner.class_eval do
+    include ActionDispatch::TestProcess
+  end
 
   # Add more helper methods to be used by all tests here...
   Shoulda::Matchers.configure do |config|
@@ -17,5 +20,13 @@ class ActiveSupport::TestCase
       with.test_framework :minitest
       with.library :rails
     end
+  end
+
+  def assert_raises_with_message(exception, msg, &block)
+    block.call
+  rescue exception => e
+    assert_match msg, e.message
+  else
+    raise "Expected to raise #{exception} w/ message #{msg}, none raised"
   end
 end
