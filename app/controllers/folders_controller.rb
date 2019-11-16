@@ -3,7 +3,7 @@ class FoldersController < ApplicationController
   before_action :find_files, only: [:rename_file]
 
   def create
-    folder = Folder.new(folder_params)
+    folder = current_user.folders.new(folder_params)
 
     if folder.save
       render json: FolderSerializer.new(folder), status: :created

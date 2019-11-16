@@ -9,7 +9,7 @@ class ApplicationController < ActionController::API
     payload = JsonWebToken.decode(header) || {}
     @current_user = User.find(payload[:id])
   rescue ActiveRecord::RecordNotFound => e
-    render json: { errors: 'Could not find user. Invalid api_key.' }, status: :not_found
+    render json: { errors: 'Could not find user. Invalid api_key.' }, status: 401
   rescue JWT::DecodeError => e
     render json: { errors: e.message }, status: :unauthorized
   end
