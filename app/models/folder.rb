@@ -67,7 +67,6 @@ class Folder < ApplicationRecord
 
     target_key = Folder.base_path_for_files_uploads(attachment, self, user)
     file.key = target_key
-    byebug
     Folder.copy_object(source_key, target_key)
     Folder.delete_object(source_key)
     file.save!

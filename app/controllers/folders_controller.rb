@@ -131,7 +131,6 @@ class FoldersController < ApplicationController
 
     @folder.files.attach(blobs)
   rescue => e
-    byebug
   end
 
   def base_path_for_files_uploads(file)
