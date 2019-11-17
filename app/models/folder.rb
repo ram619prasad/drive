@@ -30,55 +30,94 @@ class Folder < ApplicationRecord
     metadata
   end
 
-  def update_file(file:, filename:)
-    raise 'Filename cannot be blank.' if filename.blank?
+  # def update_file(file:, filename:)
+  #   raise 'Filename cannot be blank.' if filename.blank?
   
+  #   # blob = ActiveStorage::Blob.find(id)
+  #   old_filename = file.filename.to_s
+  #   extension = ActiveStorage::Filename.new(old_filename).extension_with_delimiter
+
+  #   # update the file's key and filename
+  #   new_filename = filename + extension
+  #   file.filename = new_filename
+  #   file.key = ancestors.present? ?
+  #               "#{user.email}/#{ancestors.map(&:name).join('/')}/#{name}/#{new_filename}" :
+  #               "#{user.email}/#{name}/#{new_filename}"
+  #   file.save!
+  #   file
+  # end
+
+  def update_file(file, filename, user)
+    raise 'Filename cannot be blank.' if filename.blank?
+
     # blob = ActiveStorage::Blob.find(id)
     old_filename = file.filename.to_s
     extension = ActiveStorage::Filename.new(old_filename).extension_with_delimiter
 
-    # update the file's key and filename
+    # Update the file's key and sync to S3
     new_filename = filename + extension
+    return file if old_filename == new_filename
+
+    # Need to check if we need to update all attachments/not?
+    attachment = file.attachments.last
+
+    source_key = Folder.base_path_for_files_uploads(attachment, self, user)
+    # Need to update the local filename as well
     file.filename = new_filename
-    file.key = ancestors.present? ?
-                "#{user.email}/#{ancestors.map(&:name).join('/')}/#{name}/#{new_filename}" :
-                "#{user.email}/#{name}/#{new_filename}"
+
+    target_key = Folder.base_path_for_files_uploads(attachment, self, user)
+    file.key = target_key
+    byebug
+    Folder.copy_object(source_key, target_key)
+    Folder.delete_object(source_key)
     file.save!
+
     file
   end
 
   # Class Methods
-  def self.move_files(files, source, destination, user, bucket_name: 'fidisys')
+  def self.move_files(files, source, destination, user)
     # The only way it works now is to 
     #       1. first copy the files to destination bucket
     #       2. delete the copied files from old folder.
     # Also we need to update the blob key so that there won't be confusion in the URL.
     files.each do |file|
-      source_path = base_path_for_files_uploads(file, source, user)
-      destination_path = base_path_for_files_uploads(file, destination, user)
-      source_bucket_name = bucket_name
-      target_bucket_name = bucket_name
-      source_key = source_path
-      target_key = destination_path
+      source_key = base_path_for_files_uploads(file, source, user)
+      target_key = base_path_for_files_uploads(file, destination, user)
 
       blob = file.blob
       blob.key = target_key
       blob.save!
 
-      if Rails.configuration.active_storage.service.to_s == 'amazon'
-        begin
-          S3.copy_object(bucket: target_bucket_name, copy_source: "#{source_bucket_name}/#{source_key}", key: target_key)
-          S3.delete_object(bucket: source_bucket_name, key: source_key)
-        rescue StandardError => ex
-          puts 'Caught exception copying object ' + source_key + ' from bucket ' + source_bucket_name + ' to bucket ' + target_bucket_name + ' as ' + target_key + ':'
-          puts ex.message
-          next
-        end
-      end
+      copy_and_delete_old_object(source_key, target_key)
     end
   end
 
   private
+
+  def self.copy_and_delete_old_object(source_key, target_key)
+    if Rails.configuration.active_storage.service.to_s == 'amazon'
+      begin
+        copy_object(source_key, target_key)
+        delete_object(source_key)
+      rescue StandardError => e
+      end
+    end
+  end
+
+  def self.copy_object(source_key, target_key, source_bucket: 'fidisys', target_bucket: 'fidisys')
+    S3.copy_object(bucket: target_bucket, copy_source: "#{source_bucket}/#{source_key}", key: target_key)
+  rescue StandardError => ex
+    puts 'Caught exception copying object ' + source_key + ' from bucket ' + source_bucket + ' to bucket ' + target_bucket + ' as ' + target_key + ':'
+    puts ex.message
+  end
+
+  def self.delete_object(source_key, source_bucket: 'fidisys')
+    S3.delete_object(bucket: source_bucket, key: source_key)
+  rescue StandardError => ex
+    puts 'Caught exception deleting object ' + source_key + ' from bucket ' + source_bucket
+    puts ex.message
+  end
 
   def self.base_path_for_files_uploads(file, source, user)
     file = file.blob

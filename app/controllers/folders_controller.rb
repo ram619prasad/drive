@@ -59,7 +59,7 @@ class FoldersController < ApplicationController
   end
 
   def rename_file
-    file = @folder.update_file(file: @file, filename: file_params[:filename])
+    file = @folder.update_file(@file, file_params[:filename], current_user)
     render json: { file: file }, status: :ok
   rescue => e
     render json: { errors: e.message }, status: :bad_request
