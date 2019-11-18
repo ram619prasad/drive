@@ -17,4 +17,7 @@ Rails.application.routes.draw do
       get :list_files, to: :list_files
     end
   end
+
+  post '/collaborations/add_collaborator', to: 'collaborations#create'
+  delete '/collaborations/remove_collaborator', to: 'collaborations#destroy'
 end
