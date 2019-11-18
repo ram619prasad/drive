@@ -8,6 +8,8 @@ class User < ApplicationRecord
 
   # Associations
   has_many :folders
+  has_many :collaborations
+  has_many :collaboration_folders, through: :collaborations, source: :folder
 
   # Instance Methods
   def upsert_bucket

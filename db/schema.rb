@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_22_154429) do
+ActiveRecord::Schema.define(version: 2019_11_18_152334) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,16 @@ ActiveRecord::Schema.define(version: 2019_10_22_154429) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
+  create_table "collaborations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "folder_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["folder_id"], name: "index_collaborations_on_folder_id"
+    t.index ["user_id", "folder_id"], name: "index_collaborations_on_user_id_and_folder_id", unique: true
+    t.index ["user_id"], name: "index_collaborations_on_user_id"
+  end
+
   create_table "folders", force: :cascade do |t|
     t.string "name"
     t.bigint "user_id", null: false
@@ -56,5 +66,7 @@ ActiveRecord::Schema.define(version: 2019_10_22_154429) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "collaborations", "folders"
+  add_foreign_key "collaborations", "users"
   add_foreign_key "folders", "users"
 end

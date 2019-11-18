@@ -5,6 +5,8 @@ class Folder < ApplicationRecord
 
   # Associations
   belongs_to :user
+  has_many :collaborations
+  has_many :collaborators, through: :collaborations, source: :user
 
   # Validations
   validates_uniqueness_of :name, scope: [:user_id, :ancestry]
