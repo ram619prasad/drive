@@ -31,3 +31,7 @@
 
 en:
   hello: "Hello world"
+  user:
+    signup_folder_create_error: 'Unable to create a folder for user in aws at the moment. Please try after sometime.'
+    no_user_with_email: 'No user found with the given email.'
+    invalid_password: 'Wrong password. Please try again.'
