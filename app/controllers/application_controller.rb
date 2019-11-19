@@ -3,14 +3,15 @@ class ApplicationController < ActionController::API
   attr_reader :current_user
 
   private
+
   def authorize_user
     header = request.headers['Authorization']
     header = header.split(' ').last if header
     payload = JsonWebToken.decode(header) || {}
     @current_user = User.find(payload[:id])
-  rescue ActiveRecord::RecordNotFound => e
-    render json: { errors: 'Could not find user. Invalid api_key.' }, status: 401
   rescue JWT::DecodeError => e
-    render json: { errors: e.message }, status: :unauthorized
+    render json: { message: e.message }, status: :unauthorized
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { message: "You are not authorized to perform this action." }, status: 401
   end
 end

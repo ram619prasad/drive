@@ -54,6 +54,7 @@ group :test do
   gem 'mocha'
   gem 'shoulda-context'
   gem 'shoulda-matchers'
+  gem 'mock_redis'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
