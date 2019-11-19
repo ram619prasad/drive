@@ -1,5 +1,6 @@
 class FoldersController < ApplicationController
-  before_action :find_folder, only: [:show, :update, :destroy, :add_files, :remove_files, :rename_file, :move_files, :list_files]
+  before_action :find_folder, except: [:create, :index]
+  # before_action :find_folder, only: [:show, :update, :destroy, :add_files, :remove_files, :rename_file, :move_files, :list_files]
   before_action :find_files, only: [:rename_file]
   before_action :find_attachments, only: :move_files
 

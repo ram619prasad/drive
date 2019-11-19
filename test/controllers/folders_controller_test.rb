@@ -1,18 +1,16 @@
 require 'test_helper'
 
 class FoldersControllerTest < ActionDispatch::IntegrationTest
-  # extend Shoulda::Matchers::ActionController
-
   setup do
     @user = FactoryBot.create(:user)
     @api_token = sign_in(@user)
   end
 
   context 'create' do
-    # should 'return 401' do
-    #   post '/folders'
-    #   unauthorized_route_assertions
-    # end
+    should 'return 401' do
+      post '/folders'
+      unauthorized_route_assertions
+    end
 
     should 'create a folder and return response as expected' do
       post '/folders',
