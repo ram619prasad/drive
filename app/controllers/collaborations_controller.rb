@@ -1,6 +1,6 @@
 class CollaborationsController < ApplicationController
-  before_action :find_collaborator, only: :create
-  before_action :find_folder, only: :create
+  before_action :find_collaborator, only: [:create]
+  before_action :find_folder, only: [:create]
 
   def create
     if current_user == @collaborator
@@ -11,6 +11,16 @@ class CollaborationsController < ApplicationController
     render json: FolderSerializer.new(@folder), status: 201
   rescue => e
     render json: { errors: { message: e.message } }, status: :bad_request
+  end
+
+  def destroy
+    user_id = collab_params[:user_id]
+    folder_id = collab_params[:folder_id]
+    collab = Collaboration.where(user_id: user_id, folder_id: folder_id).last
+    render json: { errors: { message: "No collaboration found for the folder (id: #{folder_id}) with the user (id: #{user_id})" } }, status: :bad_request and return
+
+    collab.destroy
+    head :no_content 
   end
 
   private
