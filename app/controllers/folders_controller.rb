@@ -16,22 +16,20 @@ class FoldersController < ApplicationController
 
   def show
     render json: FolderSerializer.new(@folder), status: :ok
-  rescue => e
-    render json: { errors: e.message }, status: :not_found
   end
 
   def update
     @folder.update_attributes!(folder_params.except(:user_id))
     render json: FolderSerializer.new(@folder), status: :ok
   rescue => e
-    render json: { errors: e.message }, status: :bad_request
+    render json: { errors: {messages: e.message} }, status: :bad_request
   end
 
   def destroy
     @folder.destroy
     head :ok
   rescue => e
-    render json: { errors: e.message }, status: :bad_request
+    render json: { errors: {messages: e.message} }, status: :bad_request
   end
 
   def index
