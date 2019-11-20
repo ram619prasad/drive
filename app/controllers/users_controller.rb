@@ -3,17 +3,18 @@ class UsersController < ApplicationController
 
   def sign_up
     user = User.new(user_params)
-    user.upsert_bucket
-
-    if(user.save)
+    if user.save
+      user.upsert_bucket
       api_token = JsonWebToken.encode({id: user.id}, browser: request.env['HTTP_USER_AGENT'])
       render json: { api_token: api_token }, status: :ok
     else
-      render json: { errors: user.errors.messages }, status: :bad_request
+      render json: { errors: { messages: user.errors.messages } }, status: :bad_request
     end
 
-  rescue
-    render json: { error: { aws: I18n.t('user.signup_folder_create_error') } }, status: :interal_server_error
+  rescue Aws::S3::Errors::ServiceError
+    render json: { error: { messages: I18n.t('user.signup_folder_create_error') } }, status: :interal_server_error
+  rescue => e
+    render json: { errors: { messages: e.message } }, status: :bad_request
   end
 
   def sign_in
@@ -22,12 +23,11 @@ class UsersController < ApplicationController
     user = User.find_by_email(email)
 
     if(!user)
-      render json: { errors: { email: I18n.t('user.no_user_with_email') } }, status: :bad_request
+      render json: { errors: { messages: I18n.t('user.no_user_with_email') } }, status: :not_found
     elsif user && !user.authenticate(password)
-      render json: { errors: { password: I18n.t('user.invalid_password') } }, status: :bad_request
+      render json: { errors: { messages: I18n.t('user.invalid_password') } }, status: :bad_request
     else
       api_token = JsonWebToken.encode({ id: user.id }, browser: request.env['HTTP_USER_AGENT'])
-      # render json: UserSerializer.new(user), status: :ok
       render json: { api_token: api_token }, status: :ok
     end
   end

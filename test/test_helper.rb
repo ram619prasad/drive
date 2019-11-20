@@ -49,5 +49,14 @@ class ActiveSupport::TestCase
     assert json_response.key?('message')
     assert_equal 'You are not authorized to perform this action.', json_response['message']
   end
+
+  def assert_bad_request
+    assert_response :bad_request
+    assert json_response.has_key?('errors')
+  end
   
+  def assert_not_found
+    assert_response :not_found
+    assert json_response.has_key?('errors')
+  end
 end
