@@ -36,9 +36,28 @@ class UsersController < ApplicationController
     render json: UserSerializer.new(current_user), status: :ok
   end
 
+  def search_user
+    search = user_params[:search]
+    if search.length < 3
+      render json: { errors: { messages: "Min 3 chars needed for user search."}}, status: :bad_request
+      return
+    end
+
+    query = "SELECT * FROM users WHERE first_name like '%#{search}%' OR last_name like '%#{search}%' OR email like '%#{search}%'"
+    ActiveRecord::Base::sanitize_sql_for_conditions(query)
+    users = User.find_by_sql(query)
+
+    if users.blank?
+      render json: { errors: { messages: "No user found with the given search term: #{search}"}}, status: :not_found
+      return
+    end
+
+    render json: UserSerializer.new(users), status: :ok
+  end
+
   private
 
   def user_params
-    params.require(:user).permit(:first_name, :last_name, :email, :password)
+    params.require(:user).permit(:first_name, :last_name, :email, :password, :search)
   end
 end
