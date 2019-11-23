@@ -1,6 +1,6 @@
 class CollaborationsController < ApplicationController
-  before_action :find_collaborator, only: [:create]
-  before_action :find_folder, only: [:create]
+  before_action :find_collaborator, except: [:current_user_collaborations]
+  before_action :find_folder, except: [:current_user_collaborations, :destroy]
 
   def create
     if current_user == @collaborator
@@ -14,13 +14,24 @@ class CollaborationsController < ApplicationController
   end
 
   def destroy
-    user_id = collab_params[:user_id]
+    if current_user == @collaborator
+      render json: { errors: { message: "You have no permissions to remove the owner of a folder." } }, status: :bad_request
+      return
+    end
+
+    user_id = @collaborator.id
     folder_id = collab_params[:folder_id]
-    collab = Collaboration.where(user_id: user_id, folder_id: folder_id).last
-    render json: { errors: { message: "No collaboration found for the folder (id: #{folder_id}) with the user (id: #{user_id})" } }, status: :bad_request and return
+    collab = Collaboration.where(user_id: @collaborator.id, folder_id: collab_params[:folder_id]).last
+    if collab.blank?
+      render json: { errors: { message: "No collaboration found for the folder (id: #{folder_id}) with the user (id: #{user_id})" } }, status: :bad_request
+      return
+    end
 
     collab.destroy
     head :no_content 
+  end
+
+  def current_user_collaborations
   end
 
   private

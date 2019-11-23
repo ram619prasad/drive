@@ -98,6 +98,20 @@ class FoldersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  context 'folders with files' do
+    setup do
+      @folder = FactoryBot.create(:folder, user: @user)
+      img = Rack::Test::UploadedFile.new(Rails.root.join('test', 'assets', 'sample.jpg'), 'image/jpeg')
+      @folder.files.attach(img)
+    end
+
+    context 'list_files' do
+      should 'return files as expected' do
+        get "/folders/#{@folder.id}/list_files", headers: { Authorization: @api_token }
+      end
+    end
+  end
+
   private
 
   def assert_folder_response(response, name: nil, user: nil)

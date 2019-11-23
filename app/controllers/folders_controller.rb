@@ -19,7 +19,7 @@ class FoldersController < ApplicationController
   end
 
   def update
-    @folder.update_attributes!(folder_params.except(:user_id))
+    @folder.update!(folder_params.except(:user_id))
     render json: FolderSerializer.new(@folder), status: :ok
   rescue => e
     render json: { errors: {messages: e.message} }, status: :bad_request
