@@ -10,7 +10,7 @@ gem 'pg'
 # For environment variables
 gem 'dotenv-rails'
 # Use Puma as the app server
-gem 'puma', '~> 3.11'
+gem 'puma', '~> 4.3'
 # For JSON views.
 gem 'fast_jsonapi'
 # Use Active Model has_secure_password
